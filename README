@@ -7,6 +7,7 @@ WHAT DOES THIS FORK MEAN TO DO?
 This is the next in a series of attempts to make Javelin a more usable framework.
 As it stands, the lack of support for common ( and some obscure ) features, make 
 it a very framework to get started with. 
+
 In the continuing weeks, I'll  be adding all the plugins and other framework related
 items to this repo, that I have been working on for the past one month. Hopefully,
 this will help some others that have wanted to use this framework or were curious 
