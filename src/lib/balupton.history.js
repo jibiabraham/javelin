@@ -229,7 +229,7 @@ JX.install( "History", {
 			this.pushState    = emptyFunction;
 			this.replaceState = emptyFunction;
 		} else {
-			JX.Stratcom.listen( 'onpopstate', null, JX.bind( this.onPopState ) )
+			JX.Stratcom.listen( 'popstate', null, JX.bind( this.onPopState ) )
 			//this.Adapter.bind( window, 'popstate', this.onPopState );
 		}
 
