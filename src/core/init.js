@@ -178,7 +178,8 @@
     'focus',
     'blur',
     'popstate',
-    'hashchange'
+    'hashchange',
+    'beforeunload'
   ];
 
 
