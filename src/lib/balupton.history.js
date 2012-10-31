@@ -18,12 +18,6 @@ JX.install( "History", {
 		this.document       = window.document; // Make sure we are using the correct document
 		this.navigator      = window.navigator; // Make sure we are using the correct navigator
 		this.sessionStorage = window.sessionStorage||false; // sessionStorage
-		this.setTimeout     = window.setTimeout;
-		this.clearTimeout   = window.clearTimeout;
-		this.setInterval    = window.setInterval;
-		this.clearInterval  = window.clearInterval;
-		this.JSON           = window.JSON;
-		this.alert          = window.alert;
 		this.history        = window.history; // Old History Object
 
 
@@ -84,7 +78,7 @@ JX.install( "History", {
 		 * this.options.initialTitle
 		 * What is the title of the initial state
 		 */
-		this.options.initialTitle = this.options.initialTitle || document.title;
+		this.options.initialTitle = this.options.initialTitle || this.document.title;
 
 
 		/**
@@ -95,12 +89,12 @@ JX.install( "History", {
 			pushState: !Boolean(
 				window.history && window.history.pushState && window.history.replaceState
 				&& !(
-					(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test( navigator.userAgent ) /* disable for versions of iOS before version 4.3 (8F190) */
-					|| (/AppleWebKit\/5([0-2]|3[0-2])/i).test(navigator.userAgent) /* disable for the mercury iOS browser, or at least older versions of the webkit engine */
+					(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test( this.navigator.userAgent ) /* disable for versions of iOS before version 4.3 (8F190) */
+					|| (/AppleWebKit\/5([0-2]|3[0-2])/i).test(this.navigator.userAgent) /* disable for the mercury iOS browser, or at least older versions of the webkit engine */
 				)
 			),
 			hashChange: Boolean(
-				!( ('onhashchange' in window) || ('onhashchange' in document) )
+				!( ('onhashchange' in window) || ('onhashchange' in this.document) )
 				||
 				( this.isInternetExplorer() && this.getInternetExplorerMajorVersion() < 8 )
 			)
@@ -122,13 +116,13 @@ JX.install( "History", {
 			 * Safari 5 and Safari iOS 4 fail to return to the correct state once a hash is replaced by a `replaceState` call
 			 * https://bugs.webkit.org/show_bug.cgi?id=56249
 			 */
-			setHash: Boolean( !this.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent) ),
+			setHash: Boolean( !this.emulated.pushState && this.navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(this.navigator.userAgent) ),
 
 			/**
 			 * Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions
 			 * https://bugs.webkit.org/show_bug.cgi?id=42940
 			 */
-			safariPoll: Boolean( !this.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent) ),
+			safariPoll: Boolean( !this.emulated.pushState && this.navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(this.navigator.userAgent) ),
 
 			/**
 			 * MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
@@ -246,10 +240,10 @@ JX.install( "History", {
 		/**
 		 * Load the Store
 		 */
-		if ( sessionStorage ) {
+		if ( this.sessionStorage ) {
 			// Fetch
 			try {
-				this.store = JX.JSON.parse( sessionStorage.getItem( 'History.store' ) ) || {};
+				this.store = JX.JSON.parse( this.sessionStorage.getItem( 'History.store' ) ) || {};
 			}
 			catch ( err ) {
 				this.store = {};
@@ -271,12 +265,12 @@ JX.install( "History", {
 		/**
 		 * Create the initial State
 		 */
-		this.saveState( this.storeState( this.extractState( document.location.href, true ) ) );
+		this.saveState( this.storeState( this.extractState( this.document.location.href, true ) ) );
 
 		/**
 		 * Bind for Saving Store
 		 */
-		if ( sessionStorage ) {
+		if ( this.sessionStorage ) {
 			// When the page is closed
 			this.onUnload = function(){
 				// Prepare
@@ -284,7 +278,7 @@ JX.install( "History", {
 
 				// Fetch
 				try {
-					currentStore = JX.JSON.parse( sessionStorage.getItem( 'History.store' ) ) || {};
+					currentStore = JX.JSON.parse( this.sessionStorage.getItem( 'History.store' ) ) || {};
 				}
 				catch ( err ) {
 					currentStore = {};
@@ -320,7 +314,7 @@ JX.install( "History", {
 				this.normalizeStore();
 
 				// Store
-				sessionStorage.setItem( 'History.store', JX.JSON.stringify( currentStore ) );
+				this.sessionStorage.setItem( 'History.store', JX.JSON.stringify( currentStore ) );
 			};
 
 			// For Internet Explorer
@@ -351,7 +345,7 @@ JX.install( "History", {
 			/**
 			 * Ensure Cross Browser Compatibility
 			 */
-			if ( navigator.vendor === 'Apple Computer, Inc.' || ( navigator.appCodeName || '' ) === 'Mozilla' ) {
+			if ( this.navigator.vendor === 'Apple Computer, Inc.' || ( this.navigator.appCodeName || '' ) === 'Mozilla' ) {
 				/**
 				 * Fix Safari HashChange Issue
 				 */
@@ -471,7 +465,7 @@ JX.install( "History", {
 						this.getInternetExplorerMajorVersion.cached :
 						(function(){
 							var v = 3,
-									div = document.createElement('div'),
+									div = this.document.createElement('div'),
 									all = div.getElementsByTagName('i');
 							while ( ( div.innerHTML = '<!--[if gt IE ' + ( ++v ) + ']><i></i><![endif]-->' ) && all[0] ) {}
 							return ( v > 4 ) ? v : false;
@@ -542,9 +536,9 @@ JX.install( "History", {
 		 */
 		getRootUrl: function(){
 			// Create
-			var rootUrl = document.location.protocol + '//' + ( document.location.hostname || document.location.host );
-			if ( document.location.port || false ) {
-				rootUrl += ':'+ document.location.port;
+			var rootUrl = this.document.location.protocol + '//' + ( this.document.location.hostname || this.document.location.host );
+			if ( this.document.location.port || false ) {
+				rootUrl += ':'+ this.document.location.port;
 			}
 			rootUrl += '/';
 
@@ -560,7 +554,7 @@ JX.install( "History", {
 		getBaseHref: function(){
 			// Create
 			var
-				baseElements = document.getElementsByTagName('base'),
+				baseElements = this.document.getElementsByTagName('base'),
 				baseElement = null,
 				baseHref = '';
 
@@ -601,7 +595,7 @@ JX.install( "History", {
 			// Fetch
 			var
 				State = this.getState( false, false ),
-				stateUrl = ( State || {} ).url || document.location.href,
+				stateUrl = ( State || {} ).url || this.document.location.href,
 				pageUrl;
 
 			// Create
@@ -620,7 +614,7 @@ JX.install( "History", {
 		 */
 		getBasePageUrl: function(){
 			// Create
-			var basePageUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
+			var basePageUrl = this.document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
 				return (/[^\/]$/).test(part) ? '' : part;
 			}).replace(/\/+$/,'')+'/';
 
@@ -821,7 +815,7 @@ JX.install( "History", {
 			newState            = {};
 			newState.normalized = true;
 			newState.title      = oldState.title || '';
-			newState.url        = this.getFullUrl( this.unescapeString( oldState.url || document.location.href ) );
+			newState.url        = this.getFullUrl( this.unescapeString( oldState.url || this.document.location.href ) );
 			newState.hash       = this.getShortUrl( newState.url );
 			newState.data       = this.cloneObject( oldState.data );
 
@@ -1197,7 +1191,7 @@ JX.install( "History", {
 		 * @return {string}
 		 */
 		getHash: function(){
-			var hash = this.unescapeHash( document.location.hash );
+			var hash = this.unescapeHash( this.document.location.hash );
 			return hash;
 		},
 
@@ -1300,7 +1294,7 @@ JX.install( "History", {
 				// PushState
 				this.pushState( State.data, State.title, State.url, false );
 			}
-			else if ( document.location.hash !== adjustedHash ) {
+			else if ( this.document.location.hash !== adjustedHash ) {
 				// Hash is a proper hash, so apply it
 
 				// Handle browser bugs
@@ -1315,7 +1309,7 @@ JX.install( "History", {
 				}
 				else {
 					// Normal hash apply
-					document.location.hash = adjustedHash;
+					this.document.location.hash = adjustedHash;
 				}
 			}
 
@@ -1392,10 +1386,10 @@ JX.install( "History", {
 
 			// Apply
 			try {
-				document.getElementsByTagName('title')[0].innerHTML = title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
+				this.document.getElementsByTagName('title')[0].innerHTML = title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
 			}
 			catch ( Exception ) { }
-			document.title = title;
+			this.document.title = title;
 
 			// Chain
 			return this;
@@ -1589,7 +1583,7 @@ JX.install( "History", {
 
 			// Get the Last State which has the new URL
 			var
-				urlState = this.extractState( document.location.href ),
+				urlState = this.extractState( this.document.location.href ),
 				newState;
 
 			// Check for a difference
@@ -1750,7 +1744,7 @@ JX.install( "History", {
 			currentHash	= this.getHash();
 			if ( currentHash ) {
 				// Expand Hash
-				currentState = this.extractState( currentHash || document.location.href, true );
+				currentState = this.extractState( currentHash || this.document.location.href, true );
 				if ( currentState ) {
 					// We were able to parse it, it must be a State!
 					// Let's forward to replaceState
@@ -1785,13 +1779,13 @@ JX.install( "History", {
 			}
 			else {
 				// Initial State
-				newState = this.extractState( document.location.href );
+				newState = this.extractState( this.document.location.href );
 			}
 
 			// The State did not exist in our store
 			if ( !newState ) {
 				// Regenerate the State
-				newState = this.createStateObject( null, null, document.location.href );
+				newState = this.createStateObject( null, null, this.document.location.href );
 			}
 
 			// Clean
