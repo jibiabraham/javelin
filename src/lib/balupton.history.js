@@ -229,7 +229,7 @@ JX.install( "History", {
 			this.pushState    = emptyFunction;
 			this.replaceState = emptyFunction;
 		} else {
-			JX.Stratcom.listen( 'popstate', null, JX.bind( this.onPopState ) )
+			JX.Stratcom.listen( 'popstate', null, JX.bind( this, this.onPopState ) )
 			//this.Adapter.bind( window, 'popstate', this.onPopState );
 		}
 
@@ -259,8 +259,8 @@ JX.install( "History", {
 		/**
 		 * Clear Intervals on exit to prevent memory leaks
 		 */
-		JX.Stratcom.listen( 'beforeunload', null, JX.bind( this.clearAllIntervals ) );
-		JX.Stratcom.listen( 'unload', null, JX.bind( this.clearAllIntervals ) );
+		JX.Stratcom.listen( 'beforeunload', null, JX.bind( this, this.clearAllIntervals ) );
+		JX.Stratcom.listen( 'unload', null, JX.bind( this, this.clearAllIntervals ) );
 
 		/**
 		 * Create the initial State
@@ -321,8 +321,8 @@ JX.install( "History", {
 			this.intervalList.push( setInterval( JX.bind( this, this.onUnload ), this.options.storeInterval ) );
 			
 			// For Other Browsers
-			JX.Stratcom.listen( 'beforeunload', null, JX.bind( this.onUnload ) );
-			JX.Stratcom.listen( 'unload', null, JX.bind( this.onUnload ) );
+			JX.Stratcom.listen( 'beforeunload', null, JX.bind( this, this.onUnload ) );
+			JX.Stratcom.listen( 'unload', null, JX.bind( this, this.onUnload ) );
 			//this.Adapter.bind( window, 'beforeunload', this.onUnload);
 			//this.Adapter.bind( window, 'unload', this.onUnload);
 			
@@ -1597,7 +1597,7 @@ JX.install( "History", {
 
 			// Apply the New State
 			//this.debug('History.safariStatePoll: trigger');
-			JX.Stratcom.trigger( "popstate" );
+			JX.Stratcom.invoke( "popstate" );
 			//this.Adapter.trigger(window,'popstate');
 
 			// Chain
@@ -1749,7 +1749,7 @@ JX.install( "History", {
 					// Traditional Anchor
 					// this.debug('History.onPopState: traditional anchor', currentHash);
 
-					JX.Stratcom.trigger( 'anchorchange' )
+					JX.Stratcom.invoke( 'anchorchange' )
 					//this.Adapter.trigger(window,'anchorchange');
 					this.busy( false );
 				}
@@ -1760,7 +1760,7 @@ JX.install( "History", {
 			}
 
 			// Ensure
-			stateId = this.Adapter.extractEventData( 'state', event, extra ) || false;
+			stateId = event.getRawEvent() ? event.getRawEvent().state : false;
 
 			// Fetch State
 			if ( stateId ) {
