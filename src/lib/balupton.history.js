@@ -42,7 +42,7 @@ JX.install( "History", {
 		 * this.options.hashChangeInterval
 		 * How long should the interval be before hashchange checks
 		 */
-		this.options.hashChangeInterval = this..options.hashChangeInterval || 100;
+		this.options.hashChangeInterval = this.options.hashChangeInterval || 100;
 
 		/**
 		 * this.options.safariPollInterval
