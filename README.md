@@ -49,4 +49,4 @@ FILES
 
 ## List of updates
 
-1. First thing on the list is a port of baluptons amazing History plugin to integrate with 	Javelin. I rather think that the default one defined here is an incomplete implementation.
+	1. First thing on the list is a port of baluptons amazing History plugin to integrate with 	Javelin. I rather think that the default one defined here is an incomplete implementation.
